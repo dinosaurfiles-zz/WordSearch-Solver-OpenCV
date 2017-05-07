@@ -1,28 +1,34 @@
 #!/usr/bin/python
-import cv2
 import sys
+import cv2
 import numpy as np
 
+# Load image and make a backup
 img = cv2.imread('training.jpg')
 imgbak = img.copy()
 
-# Add Threshold
+# Grayscale, blur, and thresholding
 gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 blur = cv2.GaussianBlur(gray, (5,5),0)
 thresh = cv2.adaptiveThreshold(blur, 255, 1, 1, 11, 2)
 
+# Find contours
 _, contours, hierarchy = cv2.findContours(thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
 
+# Ready samples and responses
 samples =  np.empty((0, 100))
 responses = []
+
+# Keys a-z
 keys = [i for i in range(97, 122)]
 
+# Enter inputs for all contours
 for cnt in reversed(contours):
-	if cv2.contourArea(cnt)>50:
+	if cv2.contourArea(cnt) > 50:
 		[x, y, w, h] = cv2.boundingRect(cnt)
 		# print("%d %d %d %d" % (x, y, w, h))
 
-		if  h>18:
+		if h > 18:
 			cv2.rectangle(img, (x, y), (x+w, y+h), (0, 0, 255), 2)
 			roi = thresh[y:y+h, x:x+w]
 			roismall = cv2.resize(roi, (10, 10))
@@ -39,7 +45,8 @@ for cnt in reversed(contours):
 
 responses = np.array(responses, np.float32)
 responses = responses.reshape((responses.size, 1))
-print("training complete")
+print("Training Complete")
 
+# Save training data
 np.savetxt('data/trainingsamples.data', samples)
 np.savetxt('data/trainingresponses.data', responses)
