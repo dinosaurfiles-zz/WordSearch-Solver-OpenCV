@@ -14,6 +14,7 @@ model.train(samples, cv2.ml.ROW_SAMPLE, responses)
 
 # Load image
 img = cv2.imread('universities.jpg')
+out = np.zeros(img.shape, np.uint8)
 imgbak = img.copy()
 
 # Grayscale, blur, and thresholding
@@ -28,11 +29,24 @@ _, contours, hierarchy = cv2.findContours(thresh, cv2.RETR_CCOMP, cv2.CHAIN_APPR
 for i in range(len(contours)):
 	# Find rectangles that are the size of a character
 	if cv2.contourArea(contours[i]) > 50 and cv2.contourArea(contours[i]) < 250:
+
+		# Letters inside the rectangle
 		if hierarchy[0][i][3] == -1:
 			[x, y, w, h] = cv2.boundingRect(contours[i])
 			cv2.rectangle(img, (x, y), (x+w, y+h), (0, 0, 255), 1)
-		# TODO: Find nearest model using KNN
 
+			# Find nearest model using KNearest
+			roi = thresh[y:y+h, x:x+w]
+			roismall = cv2.resize(roi, (10, 10))
+			roismall = roismall.reshape((1, 100))
+			roismall = np.float32(roismall)
+			retval, results, neigh_resp, dists = model.findNearest(roismall, k=1)
+
+			# Find resulting letter and append to output
+			string = chr(results[0][0])
+			cv2.putText(out, string, (x, y+h), 0, 1, (0, 255, 0))
+
+cv2.imshow('Output', out)
 cv2.imshow('Letter', img)
 cv2.imshow('Original Image', imgbak)
 cv2.waitKey(0)
