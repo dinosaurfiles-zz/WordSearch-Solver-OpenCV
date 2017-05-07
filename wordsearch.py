@@ -3,15 +3,17 @@ import cv2
 import numpy as np
 
 # Load image
-img = cv2.imread('test.jpg', 0)
+img = cv2.imread('universities.jpg')
 
-# Display image
-cv2.imshow('image', img)
+# Add Threshold
+gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+blur = cv2.GaussianBlur(gray, (5,5),0)
+thresh = cv2.adaptiveThreshold(blur, 255, 1, 1, 11, 2)
 
-# Get Key
-k = cv2.waitKey(0) & 0xFF
-if k == 27: #Esc key
-    cv2.destroyAllWindows()
-elif k == ord('s'):
-    cv2.imwrite('testgray.jpg', img)
-    cv2.destroyAllWindows()
+_, contours, hierarchy = cv2.findContours(thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+cnt = contours[0]
+x,y,w,h = cv2.boundingRect(cnt)
+crop = img[y:y+h, x:x+w]
+
+cv2.imshow('Crop', crop)
+cv2.waitKey(0)
