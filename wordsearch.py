@@ -1,5 +1,6 @@
 #!/usr/bin/python
 import sys
+
 import cv2
 import numpy as np
 
@@ -7,6 +8,9 @@ import numpy as np
 samples = np.loadtxt('data/trainingsamples.data',np.float32)
 responses = np.loadtxt('data/trainingresponses.data',np.float32)
 responses = responses.reshape((responses.size,1))
+
+# Board
+board = []
 
 # Load model
 model = cv2.ml.KNearest_create()
@@ -43,10 +47,13 @@ for i in range(len(contours)):
 			retval, results, neigh_resp, dists = model.findNearest(roismall, k=1)
 
 			# Find resulting letter and append to output
-			string = chr(results[0][0])
-			cv2.putText(out, string, (x, y+h), 0, 1, (0, 255, 0))
+			# string = chr(results[0][0])
+			board.append(chr(results[0][0]))
+			# cv2.putText(out, string, (x, y+h), 0, 1, (0, 255, 0))
 
-cv2.imshow('Output', out)
-cv2.imshow('Letter', img)
-cv2.imshow('Original Image', imgbak)
-cv2.waitKey(0)
+# Make board using the model
+board = list(reversed(board))
+board = np.array([board])
+board = np.reshape(board, (-1, 17))
+
+print(board)
