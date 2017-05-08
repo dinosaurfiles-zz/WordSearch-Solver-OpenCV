@@ -73,27 +73,30 @@ board = np.reshape(board, (-1, 17))
 print(board)
 # print(len(board[0]))
 
+flag = False
 answer = []
 for x in range(len(board)):
 	for y in range(len(board[x])):
 
 		# TODO: Find N, NE, E, SE, S, SW, W, NW
-		flag = True
 		if board[x][y] == word[0]:
 
 			# North
-			wIndex = 0
-			for tempx in range(x, -1, -1):
-				if wIndex >= len(word):
-					break
+			# Check if length is possible for a word
+			if x >= len(word) - 1 :
+				wIndex = 0
+				for tempx in range(x, -1, -1):
+					if wIndex >= len(word):
+						break
 
-				if board[tempx][y] != word[wIndex]:
-					flag = False
-					answer = []
-					break
-				else:
-					answer.append((tempx, y))
-					wIndex = wIndex + 1
+					if board[tempx][y] != word[wIndex]:
+						flag = False
+						answer = []
+						break
+					else:
+						flag = True
+						answer.append((tempx, y))
+						wIndex = wIndex + 1
 
 		if flag:
 			break
