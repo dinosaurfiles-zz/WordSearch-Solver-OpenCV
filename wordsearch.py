@@ -4,10 +4,21 @@ import sys
 import cv2
 import numpy as np
 
+import argparse
+
+parser = argparse.ArgumentParser(description='WordSearch solver using OpenCV')
+parser.add_argument('--trainingsamples', default='data/trainingsamples.data')
+parser.add_argument('--trainingresponses', default='data/trainingresponses.data')
+parser.add_argument('--image', default='universities.jpg')
+parser.add_argument('--word', default='rutger')
+args = parser.parse_args()
+
+word = args.word
+
 # Load training data
-samples = np.loadtxt('data/trainingsamples.data',np.float32)
-responses = np.loadtxt('data/trainingresponses.data',np.float32)
-responses = responses.reshape((responses.size,1))
+samples = np.loadtxt(args.trainingsamples, np.float32)
+responses = np.loadtxt(args.trainingresponses, np.float32)
+responses = responses.reshape((responses.size, 1))
 
 # Board
 board = []
@@ -17,7 +28,7 @@ model = cv2.ml.KNearest_create()
 model.train(samples, cv2.ml.ROW_SAMPLE, responses)
 
 # Load image
-img = cv2.imread('universities.jpg')
+img = cv2.imread(args.image)
 out = np.zeros(img.shape, np.uint8)
 imgbak = img.copy()
 
@@ -56,4 +67,39 @@ board = list(reversed(board))
 board = np.array([board])
 board = np.reshape(board, (-1, 17))
 
+# cv2.imshow("Image", img)
+# cv2.waitKey(0)
+
 print(board)
+# print(len(board[0]))
+
+answer = []
+for x in range(len(board)):
+	for y in range(len(board[x])):
+
+		# TODO: Find N, NE, E, SE, S, SW, W, NW
+		flag = True
+		if board[x][y] == word[0]:
+
+			# North
+			wIndex = 0
+			for tempx in range(x, -1, -1):
+				if wIndex >= len(word):
+					break
+
+				if board[tempx][y] != word[wIndex]:
+					flag = False
+					answer = []
+					break
+				else:
+					answer.append((tempx, y))
+					wIndex = wIndex + 1
+
+		if flag:
+			break
+	if flag:
+		break
+
+print(answer)
+# for x in answer:
+# 	print(board[x[0]][x[1]], end='')
