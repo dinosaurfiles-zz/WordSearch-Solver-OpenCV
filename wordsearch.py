@@ -109,6 +109,21 @@ for x in range(len(board)):
 						answer = []
 						flag = False
 						break
+
+			# South
+			# Check southbound if length is possible for a word
+			if (len(board) - x) >= len(word) and not flag:
+				wIndex = 0
+				for tempx in range(x, x+len(word)):
+					if board[tempx][y] != word[wIndex]:
+						flag = False
+						answer = []
+						break
+					else:
+						flag = True
+						answer.append((tempx, y))
+						wIndex = wIndex + 1
+
 		if flag:
 			break
 	if flag:
