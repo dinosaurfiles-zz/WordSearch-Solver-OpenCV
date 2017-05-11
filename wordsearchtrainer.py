@@ -3,8 +3,14 @@ import sys
 import cv2
 import numpy as np
 
+import argparse
+
+parser = argparse.ArgumentParser(description='WordSearchTrainer')
+parser.add_argument('--trainimg', default='training.png')
+args = parser.parse_args()
+
 # Load image and make a backup
-img = cv2.imread('training.jpg')
+img = cv2.imread(args.trainimg)
 imgbak = img.copy()
 
 # Grayscale, blur, and thresholding
@@ -20,25 +26,25 @@ samples =  np.empty((0, 100))
 responses = []
 
 # Keys a-z
-keys = [i for i in range(97, 122)]
+keys = [i for i in range(97, 123)]
 
 # Enter inputs for all contours
 for cnt in reversed(contours):
 	if cv2.contourArea(cnt) > 50:
 		[x, y, w, h] = cv2.boundingRect(cnt)
-		# print("%d %d %d %d" % (x, y, w, h))
 
 		if h > 18:
 			cv2.rectangle(img, (x, y), (x+w, y+h), (0, 0, 255), 2)
 			roi = thresh[y:y+h, x:x+w]
 			roismall = cv2.resize(roi, (10, 10))
-			cv2.imshow('norm', img)
+			cv2.imshow('Green: indicates already received input. Red: current letter', img)
 			key = cv2.waitKey(0)
 			cv2.rectangle(img, (x, y), (x+w, y+h), (0, 255, 0), 2)
 
 			if key == 27:
 				sys.exit()
 			elif key in keys:
+				# Save responses
 				responses.append(key)
 				sample = roismall.reshape((1, 100))
 				samples = np.append(samples, sample, 0)
