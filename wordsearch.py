@@ -69,8 +69,6 @@ board = np.array([board])
 board = np.reshape(board, (-1, 17))
 boardDetail = list(reversed(boardDetail))
 
-print(board)
-
 # Word Search Algorithm
 orientation = 0
 flag = False
@@ -78,33 +76,27 @@ answer = []
 for x in range(len(board)):
 	for y in range(len(board[x])):
 
-		# TODO: Find N, NE, E, SE, S, SW, W, NW
 		if board[x][y] == word[0]:
 
 			# North
 			# Check northbound if length is possible for a word
 			if x >= len(word) - 1 and not flag:
-				wIndex = 0
-				for tempx in range(x, -1, -1):
-					if wIndex >= len(word):
-						break
-
-					if board[tempx][y] != word[wIndex]:
-						flag = False
-						answer = []
-						break
-					else:
+				for wIndex in range(len(word)):
+					if board[x - wIndex][y] == word[wIndex]:
+						answer.append((x - wIndex, y))
 						flag = True
-						answer.append((tempx, y))
-						wIndex = wIndex + 1
 						orientation = 0
+					else:
+						answer = []
+						flag = False
+						break
 
 			# East
 			# Check eastbound if length is possible for a word
 			if (len(board[x]) - y >= len(word)) and not flag:
-				for tempy in range(len(word)):
-					if board[x][y + tempy] == word[tempy]:
-						answer.append((x, y + tempy))
+				for wIndex in range(len(word)):
+					if board[x][y + wIndex] == word[wIndex]:
+						answer.append((x, y + wIndex))
 						flag = True
 						orientation = 2
 					else:
@@ -115,28 +107,23 @@ for x in range(len(board)):
 			# South
 			# Check southbound if length is possible for a word
 			if (len(board) - x) >= len(word) and not flag:
-				wIndex = 0
-				for tempx in range(x, x+len(word)):
-					if board[tempx][y] != word[wIndex]:
-						flag = False
-						answer = []
-						break
-					else:
+				for wIndex in range(len(word)):
+					if board[x + wIndex][y] == word[wIndex]:
+						answer.append((x + wIndex, y))
 						flag = True
-						answer.append((tempx, y))
-						wIndex = wIndex + 1
 						orientation = 4
+					else:
+						answer = []
+						flag = False
+						break
 
 			# West
 			# Check westbound if length is possible for a word
 			if (((y+1) - len(word) ) >= 0) and not flag:
-				wIndex = 0
-				for tempy in range(y, y - (len(word)), -1):
-
-					if board[x][tempy] == word[wIndex]:
-						answer.append((x, tempy))
+				for wIndex in range(len(word)):
+					if board[x][y - wIndex] == word[wIndex]:
+						answer.append((x, y - wIndex))
 						flag = True
-						wIndex = wIndex + 1
 						orientation = 6
 					else:
 						answer = []
@@ -194,47 +181,56 @@ for x in range(len(board)):
 						answer = []
 						flag = False
 						break
-
-
 		if flag:
 			break
 	if flag:
 		break
 
-print(answer)
+if not flag:
+	print("Word not found in the puzzle")
+else:
+	# Draw lines
+	firstCoord = boardDetail[(answer[0][0] * len(board)) + answer[0][1]]
+	lastCoord = boardDetail[(answer[-1][0] * len(board)) + answer[-1][1]]
 
-# Draw lines
-# if not flag:
-# 	print("Word not found in the puzzle")
-# else:
-# 	firstCoord = boardDetail[(answer[0][0] * len(board)) + answer[0][1]]
-# 	lastCoord = boardDetail[(answer[-1][0] * len(board)) + answer[-1][1]]
-# 	print("%s %s" % (firstCoord, lastCoord))
-#
-# 	if orientation == 4 or orientation == 6:
-# 		tempOr = firstCoord
-# 		firstCoord = lastCoord
-# 		lastCoord = tempOr
-#
-# 	if orientation == 0 or orientation == 4:
-# 		pts = np.array([
-# 			[lastCoord[0], lastCoord[1]],
-# 			[lastCoord[0] + lastCoord[2], lastCoord[1]],
-# 			[firstCoord[0] + firstCoord[3], firstCoord[1] + firstCoord[2]],
-# 			[firstCoord[0], firstCoord[1] + firstCoord[3]]],
-# 		np.int32)
-# 	elif orientation == 2 or orientation == 6:
-# 		pts = np.array([
-# 			[firstCoord[0], firstCoord[1]],
-# 			[lastCoord[0] + lastCoord[2], lastCoord[1]],
-# 			[lastCoord[0] + lastCoord[2], lastCoord[1] + lastCoord[3]],
-# 			[firstCoord[0], firstCoord[1] + firstCoord[3]]],
-# 		np.int32)
-#
-# 	pts = pts.reshape((-1,1,2))
-# 	cv2.polylines(imgAnswer,[pts],True,(0, 0, 255), 2)
-#
-# 	# cv2.imshow("Original Image", img)
-# 	# Show answer
-# 	cv2.imshow("Answer", imgAnswer)
-# 	cv2.waitKey(0)
+	# Reverse lines
+	if orientation == 4 or orientation == 6 or orientation == 5 or orientation == 7:
+		tempOr = firstCoord
+		firstCoord = lastCoord
+		lastCoord = tempOr
+
+	if orientation == 0 or orientation == 4:
+		pts = np.array([
+			[lastCoord[0], lastCoord[1]],
+			[lastCoord[0] + lastCoord[2], lastCoord[1]],
+			[firstCoord[0] + firstCoord[3], firstCoord[1] + firstCoord[2]],
+			[firstCoord[0], firstCoord[1] + firstCoord[3]]],
+		np.int32)
+	elif orientation == 2 or orientation == 6:
+		pts = np.array([
+			[firstCoord[0], firstCoord[1]],
+			[lastCoord[0] + lastCoord[2], lastCoord[1]],
+			[lastCoord[0] + lastCoord[2], lastCoord[1] + lastCoord[3]],
+			[firstCoord[0], firstCoord[1] + firstCoord[3]]],
+		np.int32)
+	elif orientation == 1 or orientation == 5:
+		pts = np.array([
+			[firstCoord[0], firstCoord[1]],
+			[lastCoord[0], lastCoord[1]],
+			[lastCoord[0] + lastCoord[2] + 10, lastCoord[1]],
+			[firstCoord[0], firstCoord[1] + firstCoord[3] + 10]],
+		np.int32)
+	elif orientation == 3 or orientation == 7:
+		pts = np.array([
+			[firstCoord[0], firstCoord[1] - 10],
+			[lastCoord[0] + lastCoord[2], lastCoord[1]],
+			[lastCoord[0] + lastCoord[2], lastCoord[1] + lastCoord[3] + 10],
+			[firstCoord[0], firstCoord[1] + firstCoord[3]]],
+		np.int32)
+
+	pts = pts.reshape((-1,1,2))
+	cv2.polylines(imgAnswer,[pts],True,(0, 0, 255), 2)
+
+	# Show answer
+	cv2.imshow("Answer", imgAnswer)
+	cv2.waitKey(0)
