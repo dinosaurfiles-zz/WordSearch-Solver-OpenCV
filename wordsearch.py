@@ -124,11 +124,28 @@ for x in range(len(board)):
 						answer.append((tempx, y))
 						wIndex = wIndex + 1
 
+			# West
+			# Check westbound if length is possible for a word
+			if (((y+1) - len(word) ) >= 0) and not flag:
+				wIndex = 0
+				for tempy in range(y, y - (len(word)), -1):
+
+					if board[x][tempy] == word[wIndex]:
+						answer.append((x, tempy))
+						flag = True
+						wIndex = wIndex + 1
+					else:
+						answer = []
+						flag = False
+						break
 		if flag:
 			break
 	if flag:
 		break
 
-print(answer)
+if not flag:
+	print("No such word found in the puzzle")
+else:
+	print(answer)
 # for x in answer:
 # 	print(board[x[0]][x[1]], end='')
