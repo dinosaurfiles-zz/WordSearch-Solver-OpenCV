@@ -182,6 +182,19 @@ for x in range(len(board)):
 						flag = False
 						break
 
+			# NorthWest
+			# Check northwestbound if length is possible for a word
+			if y - len(word) + 1 >= 0 and x - len(word) + 1 >= 0 and not flag:
+				for wIndex in range(len(word)):
+					if board[x - wIndex][y - wIndex] == word[wIndex]:
+						answer.append((x - wIndex, y - wIndex))
+						flag = True
+						orientation = 7
+					else:
+						answer = []
+						flag = False
+						break
+
 
 		if flag:
 			break
