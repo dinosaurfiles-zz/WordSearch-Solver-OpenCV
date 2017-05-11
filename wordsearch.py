@@ -22,6 +22,7 @@ responses = responses.reshape((responses.size, 1))
 
 # Board
 board = []
+boardDetail = []
 
 # Load model
 model = cv2.ml.KNearest_create()
@@ -30,7 +31,8 @@ model.train(samples, cv2.ml.ROW_SAMPLE, responses)
 # Load image
 img = cv2.imread(args.image)
 out = np.zeros(img.shape, np.uint8)
-imgbak = img.copy()
+imgPlain = img.copy()
+imgAnswer = img.copy()
 
 # Grayscale, blur, and thresholding
 gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
@@ -58,21 +60,19 @@ for i in range(len(contours)):
 			retval, results, neigh_resp, dists = model.findNearest(roismall, k=1)
 
 			# Find resulting letter and append to output
-			# string = chr(results[0][0])
 			board.append(chr(results[0][0]))
-			# cv2.putText(out, string, (x, y+h), 0, 1, (0, 255, 0))
+			boardDetail.append((x, y, w, h))
 
 # Make board using the model
 board = list(reversed(board))
 board = np.array([board])
 board = np.reshape(board, (-1, 17))
-
-# cv2.imshow("Image", img)
-# cv2.waitKey(0)
+boardDetail = list(reversed(boardDetail))
 
 print(board)
-# print(len(board[0]))
 
+# Word Search Algorithm
+orientation = 0
 flag = False
 answer = []
 for x in range(len(board)):
@@ -97,6 +97,7 @@ for x in range(len(board)):
 						flag = True
 						answer.append((tempx, y))
 						wIndex = wIndex + 1
+						orientation = 0
 
 			# East
 			# Check eastbound if length is possible for a word
@@ -105,6 +106,7 @@ for x in range(len(board)):
 					if board[x][y + tempy] == word[tempy]:
 						answer.append((x, y + tempy))
 						flag = True
+						orientation = 2
 					else:
 						answer = []
 						flag = False
@@ -123,6 +125,7 @@ for x in range(len(board)):
 						flag = True
 						answer.append((tempx, y))
 						wIndex = wIndex + 1
+						orientation = 4
 
 			# West
 			# Check westbound if length is possible for a word
@@ -134,18 +137,65 @@ for x in range(len(board)):
 						answer.append((x, tempy))
 						flag = True
 						wIndex = wIndex + 1
+						orientation = 6
 					else:
 						answer = []
 						flag = False
 						break
+
+			# NorthEast
+			# Check northeastbound if length is possible for a word
+			if y + len(word) <= len(board) and x - len(word) + 1 >= 0 and not flag:
+				for wIndex in range(len(word)):
+					if board[x - wIndex][y + wIndex] == word[wIndex]:
+						answer.append((x - wIndex, y + wIndex))
+						flag = True
+						orientation = 1
+					else:
+						answer = []
+						flag = False
+						break
+
+
 		if flag:
 			break
 	if flag:
 		break
 
-if not flag:
-	print("No such word found in the puzzle")
-else:
-	print(answer)
-# for x in answer:
-# 	print(board[x[0]][x[1]], end='')
+print(answer)
+
+# Draw lines
+# if not flag:
+# 	print("Word not found in the puzzle")
+# else:
+# 	firstCoord = boardDetail[(answer[0][0] * len(board)) + answer[0][1]]
+# 	lastCoord = boardDetail[(answer[-1][0] * len(board)) + answer[-1][1]]
+# 	print("%s %s" % (firstCoord, lastCoord))
+#
+# 	if orientation == 4 or orientation == 6:
+# 		tempOr = firstCoord
+# 		firstCoord = lastCoord
+# 		lastCoord = tempOr
+#
+# 	if orientation == 0 or orientation == 4:
+# 		pts = np.array([
+# 			[lastCoord[0], lastCoord[1]],
+# 			[lastCoord[0] + lastCoord[2], lastCoord[1]],
+# 			[firstCoord[0] + firstCoord[3], firstCoord[1] + firstCoord[2]],
+# 			[firstCoord[0], firstCoord[1] + firstCoord[3]]],
+# 		np.int32)
+# 	elif orientation == 2 or orientation == 6:
+# 		pts = np.array([
+# 			[firstCoord[0], firstCoord[1]],
+# 			[lastCoord[0] + lastCoord[2], lastCoord[1]],
+# 			[lastCoord[0] + lastCoord[2], lastCoord[1] + lastCoord[3]],
+# 			[firstCoord[0], firstCoord[1] + firstCoord[3]]],
+# 		np.int32)
+#
+# 	pts = pts.reshape((-1,1,2))
+# 	cv2.polylines(imgAnswer,[pts],True,(0, 0, 255), 2)
+#
+# 	# cv2.imshow("Original Image", img)
+# 	# Show answer
+# 	cv2.imshow("Answer", imgAnswer)
+# 	cv2.waitKey(0)
