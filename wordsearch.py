@@ -9,7 +9,7 @@ import argparse
 parser = argparse.ArgumentParser(description='WordSearch solver using OpenCV')
 parser.add_argument('--trainingsamples', default='data/trainingsamples.data')
 parser.add_argument('--trainingresponses', default='data/trainingresponses.data')
-parser.add_argument('--image', default='universities.jpg')
+parser.add_argument('--image', default='universities.png')
 parser.add_argument('--word', default='rutger')
 args = parser.parse_args()
 
@@ -203,31 +203,35 @@ else:
 
 	if orientation == 0 or orientation == 4:
 		pts = np.array([
-			[lastCoord[0], lastCoord[1]],
-			[lastCoord[0] + lastCoord[2], lastCoord[1]],
-			[firstCoord[0] + firstCoord[3], firstCoord[1] + firstCoord[2]],
-			[firstCoord[0], firstCoord[1] + firstCoord[3]]],
+			[lastCoord[0] - 5, lastCoord[1] - 5],
+			[lastCoord[0] + 18, lastCoord[1] - 5],
+			[lastCoord[0] + 18, firstCoord[1] + firstCoord[3] + 5],
+			[lastCoord[0] - 5, firstCoord[1] + firstCoord[3] + 5]],
 		np.int32)
 	elif orientation == 2 or orientation == 6:
 		pts = np.array([
-			[firstCoord[0], firstCoord[1]],
-			[lastCoord[0] + lastCoord[2], lastCoord[1]],
-			[lastCoord[0] + lastCoord[2], lastCoord[1] + lastCoord[3]],
-			[firstCoord[0], firstCoord[1] + firstCoord[3]]],
+			[firstCoord[0] - 5, firstCoord[1] - 5],
+			[lastCoord[0] + lastCoord[2] + 5, firstCoord[1] - 5],
+			[lastCoord[0] + lastCoord[2] + 5, firstCoord[1] + 24],
+			[firstCoord[0] - 5, firstCoord[1] + 24]],
 		np.int32)
 	elif orientation == 1 or orientation == 5:
 		pts = np.array([
-			[firstCoord[0], firstCoord[1]],
-			[lastCoord[0], lastCoord[1]],
-			[lastCoord[0] + lastCoord[2] + 10, lastCoord[1]],
-			[firstCoord[0], firstCoord[1] + firstCoord[3] + 10]],
+			[firstCoord[0] - 2, firstCoord[1]],
+			[lastCoord[0], lastCoord[1] - 2],
+			[lastCoord[0] + 18, lastCoord[1] - 2],
+			[lastCoord[0] + 18, lastCoord[1] + 15],
+			[firstCoord[0] + 12, firstCoord[1] + 20],
+			[firstCoord[0] - 2, firstCoord[1] + 20]],
 		np.int32)
 	elif orientation == 3 or orientation == 7:
 		pts = np.array([
-			[firstCoord[0], firstCoord[1] - 10],
-			[lastCoord[0] + lastCoord[2], lastCoord[1]],
-			[lastCoord[0] + lastCoord[2], lastCoord[1] + lastCoord[3] + 10],
-			[firstCoord[0], firstCoord[1] + firstCoord[3]]],
+			[firstCoord[0] - 5, firstCoord[1] - 5],
+			[firstCoord[0] - 5 + 18, firstCoord[1] - 5],
+			[lastCoord[0] + 18, lastCoord[1]],
+			[lastCoord[0] + 18, lastCoord[1] + 22],
+			[lastCoord[0] - 2, lastCoord[1] + 22],
+			[firstCoord[0] - 5, firstCoord[1] + 18]],
 		np.int32)
 
 	pts = pts.reshape((-1,1,2))
