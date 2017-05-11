@@ -82,8 +82,8 @@ for x in range(len(board)):
 		if board[x][y] == word[0]:
 
 			# North
-			# Check if length is possible for a word
-			if x >= len(word) - 1 :
+			# Check northbound if length is possible for a word
+			if x >= len(word) - 1 and not flag:
 				wIndex = 0
 				for tempx in range(x, -1, -1):
 					if wIndex >= len(word):
@@ -98,6 +98,17 @@ for x in range(len(board)):
 						answer.append((tempx, y))
 						wIndex = wIndex + 1
 
+			# East
+			# Check eastbound if length is possible for a word
+			if (len(board[x]) - y >= len(word)) and not flag:
+				for tempy in range(len(word)):
+					if board[x][y + tempy] == word[tempy]:
+						answer.append((x, y + tempy))
+						flag = True
+					else:
+						answer = []
+						flag = False
+						break
 		if flag:
 			break
 	if flag:
