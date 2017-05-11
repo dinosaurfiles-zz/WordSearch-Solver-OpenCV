@@ -159,12 +159,24 @@ for x in range(len(board)):
 			# SouthEast
 			# Check southeastbound if length is possible for a word
 			if y + len(word) <= len(board) and x + len(word) <= len(board) and not flag:
-				# print("%d %d" %(x, y))
 				for wIndex in range(len(word)):
 					if board[x + wIndex][y + wIndex] == word[wIndex]:
 						answer.append((x + wIndex, y + wIndex))
 						flag = True
 						orientation = 3
+					else:
+						answer = []
+						flag = False
+						break
+
+			# SouthWest
+			# Check southwestbound if length is possible for a word
+			if y - len(word) + 1 >= 0 and x + len(word) <= len(board) and not flag:
+				for wIndex in range(len(word)):
+					if board[x + wIndex][y - wIndex] == word[wIndex]:
+						answer.append((x + wIndex, y - wIndex))
+						flag = True
+						orientation = 5
 					else:
 						answer = []
 						flag = False
