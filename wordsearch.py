@@ -69,6 +69,8 @@ board = np.array([board])
 board = np.reshape(board, (-1, 17))
 boardDetail = list(reversed(boardDetail))
 
+print(board)
+
 # Word Search Algorithm
 orientation = 0
 flag = False
