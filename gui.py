@@ -11,17 +11,14 @@ class Application(tk.Frame):
 	def __init__(self, master):
 		super().__init__(master)
 		self.pack()
-		self.wordSearchMain()
 		self.inputList = []
 		self.imageFile = "/home/stuxnet/Documents/Major/CMSC197 - Computer Vision/Lab Activities/Final Project/universities.png"
+		self.wordSearchMain(self.imageFile)
 		self.create_widgets()
 
 	def create_widgets(self):
 		self.image = tk.PhotoImage(file=self.imageFile)
 		self.imgLabel = tk.Label(self, image=self.image)
-
-		# self.selectedPhotoImage = tk.PhotoImage(file=self.imageFile2)
-		# self.imgLabel.config(image=self.selectedPhotoImage)
 
 		self.imgLabel.grid(row=1, column=1, rowspan=5, columnspan=4)
 
@@ -42,14 +39,15 @@ class Application(tk.Frame):
 		self.selectedPhotoImage = tk.PhotoImage(file=self.selectedImage)
 		self.imgLabel.configure(image=self.selectedPhotoImage)
 		self.inputList = []
+		self.history.configure(text=self.inputList)
+		self.wordSearchMain(self.selectedImage)
 
 	def submitWord(self):
 		self.newInput = self.wordEntry.get()
 		self.inputList.append(self.newInput)
-		self.history.configure(text="\n".join(map(str, self.inputList)))
 		self.wordSearchAlgo(self.newInput)
 
-	def wordSearchMain(self):
+	def wordSearchMain(self, imageName):
 		# Load training data
 		samples = np.loadtxt("data/trainingsamples.data", np.float32)
 		responses = np.loadtxt("data/trainingresponses.data", np.float32)
@@ -64,7 +62,7 @@ class Application(tk.Frame):
 		model.train(samples, cv2.ml.ROW_SAMPLE, responses)
 
 		# Load image
-		img = cv2.imread("/home/stuxnet/Documents/Major/CMSC197 - Computer Vision/Lab Activities/Final Project/universities.png")
+		img = cv2.imread(imageName)
 		out = np.zeros(img.shape, np.uint8)
 		imgPlain = img.copy()
 		self.imgAnswer = img.copy()
@@ -222,7 +220,7 @@ class Application(tk.Frame):
 				break
 
 		if not flag:
-			print("Word not found in the puzzle")
+			self.inputList[-1] = "[ ] " + self.inputList[-1]
 		else:
 			# Draw lines
 			firstCoord = self.boardDetail[(answer[0][0] * len(self.board)) + answer[0][1]]
@@ -268,9 +266,15 @@ class Application(tk.Frame):
 				np.int32)
 
 			pts = pts.reshape((-1,1,2))
-			cv2.polylines(self.imgAnswer,[pts],True,(0, 0, 255), 2)
+			cv2.polylines(self.imgAnswer,[pts],True,(255, 0, 0), 2)
 
-			
+			self.imgAnswerOut = Image.fromarray(self.imgAnswer)
+			self.imgAnswerOut = ImageTk.PhotoImage(self.imgAnswerOut)
+
+			self.imgLabel.configure(image=self.imgAnswerOut)
+			self.inputList[-1] = "[x] " + self.inputList[-1]
+
+		self.history.configure(text="\n".join(map(str, self.inputList)))
 
 if __name__ == '__main__':
 	root = tk.Tk()
