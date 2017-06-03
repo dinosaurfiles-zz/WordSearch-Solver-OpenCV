@@ -279,7 +279,7 @@ class Application(tk.Frame):
 if __name__ == '__main__':
 	root = tk.Tk()
 	wordSearchApp = Application(master=root)
-	wordSearchApp.master.title("Word Search Solver")
+	wordSearchApp.master.title("Word Search Puzzle Solver")
 	wordSearchApp.master.geometry("1100x700")
 	wordSearchApp.master.resizable(width=False, height=False)
 	wordSearchApp.mainloop()
