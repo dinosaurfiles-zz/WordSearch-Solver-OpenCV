@@ -238,5 +238,7 @@ else:
 	cv2.polylines(imgAnswer,[pts],True,(0, 0, 255), 2)
 
 	# Show answer
+	cv2.imshow("Original", imgPlain)
+	cv2.imshow("Original Contoured", img)
 	cv2.imshow("Answer", imgAnswer)
 	cv2.waitKey(0)
